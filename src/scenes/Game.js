@@ -4,6 +4,7 @@ import { CarPhysics } from "../physics/CarPhysics.js";
 import { HUD } from "../ui/HUD.js";
 import { Track } from "../track/Track.js";
 import { Storage } from "../storage/Storage.js";
+import { SettingsUI } from "../ui/SettingsUI.js";
 
 export class Game extends Phaser.Scene {
     constructor() {
@@ -22,7 +23,7 @@ export class Game extends Phaser.Scene {
     }
 
     create() {
-        const worldSize = 4000;
+        const worldSize = 8000;
 
         // Добавляем тайловый фон (сетка)
         this.background = this.add.tileSprite(0, 0, worldSize, worldSize, 'background');
@@ -56,9 +57,10 @@ export class Game extends Phaser.Scene {
         // Настройка коллизий (сенсоры чекпоинтов)
         this.setupCollisions();
 
-        // Настройка камеры
-        this.cameras.main.setBounds(0, 0, worldSize, worldSize);
-        
+        // Инициализация настроек
+        this.settingsUI = new SettingsUI(this);
+        document.getElementById('settings-btn').onclick = () => this.settingsUI.show();
+
         console.log('Game Scene: Трасса создана. Система кругов инициализирована.');
     }
 
@@ -201,17 +203,23 @@ export class Game extends Phaser.Scene {
         
         // Коэффициенты для настройки поведения
         const lerpFactor = 0.05; // Плавность следования
-        const lookAheadFactor = 20; // Насколько сильно камера "заглядывает" вперед (в секундах или пикселях от скорости)
+        const lookAheadFactor = 25; // На сколько камеру выносить вперед
+
+        // Динамический зум на основе скорости
+        const velocity = carBody.velocity;
+        const speed = Math.sqrt(velocity.x ** 2 + velocity.y ** 2);
+        
+        // Масштабируем зум: от 1.0 (на месте) до 0.5 (на высокой скорости)
+        const targetZoom = Phaser.Math.Clamp(1.0 - (speed / 100), 0.5, 1.0);
+        cam.zoom = Phaser.Math.Linear(cam.zoom, targetZoom, 0.02);
 
         // Целевая позиция - позиция машины + смещение по вектору скорости
         const targetX = carBody.position.x + carBody.velocity.x * lookAheadFactor;
         const targetY = carBody.position.y + carBody.velocity.y * lookAheadFactor;
 
-        // Применяем lerp для плавного перемещения
-        // Используем метод scrollX/scrollY для управления камерой
-        // Центрируем камеру (вычитаем половину ширины/высоты экрана)
-        const targetScrollX = targetX - cam.width / 2;
-        const targetScrollY = targetY - cam.height / 2;
+        // Центрируем камеру
+        const targetScrollX = targetX - cam.width / 2 / cam.zoom;
+        const targetScrollY = targetY - cam.height / 2 / cam.zoom;
 
         cam.scrollX = Phaser.Math.Linear(cam.scrollX, targetScrollX, lerpFactor);
         cam.scrollY = Phaser.Math.Linear(cam.scrollY, targetScrollY, lerpFactor);

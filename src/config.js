@@ -10,15 +10,15 @@ const defaultCarPhysics = {
   C_lat: 0.8, // Повысили для лучшего "зацепа" и реакции
 
   // Рулевое управление
-  maxSteerDeg: 40,
-  steerRateDegPerSec: 150,
-  steerReturnDegPerSec: 100,
+  maxSteerDeg: 35,
+  steerRateDegPerSec: 100,
+  steerReturnDegPerSec: 120,
 
   // Тяга и тормоза
   maxDriveForce: 0.15,
   brakeForce: 0.1,
-  linearDrag: 0.01,
-  angularDamping: 0.15,
+  linearDrag: 0.012,
+  angularDamping: 0.3,
 
   // Двигатель и трансмиссия
   gearRatios: [0, 3.5, 2.3, 1.6, 1.2, 1.0], // 0 - N, 1..5 - передачи

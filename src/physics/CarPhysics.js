@@ -117,7 +117,7 @@ export class CarPhysics {
         vel.y *= (1 - p.linearDrag);
 
         // Угловая скорость
-        angVel += torque / (mass * 150); // Уменьшили момент инерции для лучшего поворота
+        angVel += torque / (mass * 300); // Сделали машину "тяжелее" (было 150)
         angVel *= (1 - p.angularDamping);
 
         // 9. Синхронизация с Matter
