@@ -82,6 +82,14 @@ export class Car {
         this.graphics.restore();
     }
 
+    drawSteerableWheel(lx, ly, w, h, angle) {
+        this.graphics.save();
+        this.graphics.translateCanvas(lx, ly);
+        this.graphics.rotateCanvas(angle);
+        this.graphics.fillRect(-w / 2, -h / 2, w, h);
+        this.graphics.restore();
+    }
+
     getWheelPositions() {
         const { x, y } = this.body.position;
         const angle = this.body.angle;
