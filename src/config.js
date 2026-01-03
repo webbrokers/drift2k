@@ -1,4 +1,6 @@
 import { Storage } from "./storage/Storage.js";
+import { Boot } from "./scenes/Boot.js";
+import { Game } from "./scenes/Game.js";
 
 const defaultCarPhysics = {
   // Трение и сцепление
