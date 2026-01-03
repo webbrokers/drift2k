@@ -72,16 +72,18 @@ export class CarPhysics {
         const mu_rear = input.handbrake ? p.muRear * p.muRearHandbrakeMult : p.muRear;
         const mu_front = p.muFront;
         
-        // Масса и нормальная нагрузка (N) упрощенно
         const mass = body.mass;
         const frictionLimitFront = mu_front * mass * 0.5;
         const frictionLimitRear = mu_rear * mass * 0.5;
 
-        // Боковая сила (противодействие боковому скольжению)
-        // v_side для передней и задней оси
-        // Упрощенная модель:
-        const slipSideFront = v_side + angVel * 30; // 30 - расстояние до оси
-        const slipSideRear = v_side - angVel * 30;
+        // Боковая скорость на осях
+        const vSideFront = v_side + angVel * 30;
+        const vSideRear = v_side - angVel * 30;
+
+        // Скольжение передней оси (с учетом поворота колес)
+        // Проекция скорости на ось, перпендикулярную колесу
+        const slipSideFront = (vSideFront * Math.cos(currentSteerRad)) - (v_forward * Math.sin(currentSteerRad));
+        const slipSideRear = vSideRear;
 
         let fLatFront = -slipSideFront * p.C_lat;
         let fLatRear = -slipSideRear * p.C_lat;
@@ -91,16 +93,11 @@ export class CarPhysics {
         fLatRear = Phaser.Math.Clamp(fLatRear, -frictionLimitRear, frictionLimitRear);
 
         // 7. Итоговые силы
-        // Тяга (вперед)
         const totalFwd = driveForce - (input.brake * p.brakeForce);
         
-        // Yaw effect (поворот)
-        // Зависит от поворота руля и скорости
-        const steerEffect = currentSteerRad * v_forward * 0.05;
-        
-        // Угловое ускорение (torque)
-        // Силы осей создают момент
-        const torque = (fLatFront * 30) - (fLatRear * 30) + steerEffect;
+        // Момент вращения: передняя боковая сила создает момент через плечо
+        // (учитываем, что сила fLatFront направлена под углом колеса)
+        const torque = (fLatFront * Math.cos(currentSteerRad) * 30) - (fLatRear * 30);
 
         // 8. Интеграция (Эйлер)
         // Линейное ускорение (локальное)
@@ -120,7 +117,7 @@ export class CarPhysics {
         vel.y *= (1 - p.linearDrag);
 
         // Угловая скорость
-        angVel += torque / (mass * 500); // 500 - условный момент инерции
+        angVel += torque / (mass * 150); // Уменьшили момент инерции для лучшего поворота
         angVel *= (1 - p.angularDamping);
 
         // 9. Синхронизация с Matter

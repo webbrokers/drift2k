@@ -6,8 +6,8 @@ const defaultCarPhysics = {
   // Трение и сцепление
   muFront: 0.9,
   muRear: 0.8,
-  muRearHandbrakeMult: 0.4,
-  C_lat: 0.5, // Коэффициент латеральной силы
+  muRearHandbrakeMult: 0.3,
+  C_lat: 0.8, // Повысили для лучшего "зацепа" и реакции
 
   // Рулевое управление
   maxSteerDeg: 40,
@@ -15,10 +15,10 @@ const defaultCarPhysics = {
   steerReturnDegPerSec: 100,
 
   // Тяга и тормоза
-  maxDriveForce: 0.05,
-  brakeForce: 0.03,
-  linearDrag: 0.005,
-  angularDamping: 0.1,
+  maxDriveForce: 0.15,
+  brakeForce: 0.1,
+  linearDrag: 0.01,
+  angularDamping: 0.15,
 
   // Двигатель и трансмиссия
   gearRatios: [0, 3.5, 2.3, 1.6, 1.2, 1.0], // 0 - N, 1..5 - передачи
